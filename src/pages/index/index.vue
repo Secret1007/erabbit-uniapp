@@ -59,13 +59,6 @@ onLoad(async () => {
   await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
   isLoading.value = false
 })
-
-// 页面加载
-onLoad(() => {
-  getHomeBannerData()
-  getHomeCategoryData()
-  getHomeHotData()
-})
 </script>
 
 <template>
