@@ -3,6 +3,7 @@ import XtxSwiper from '@/components/XtxSwiper.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import customNavBar from './components/customNavBar.vue'
 import HotPanel from './components/HotPane.vue'
+import PageSkeleton from './components/PageSkeleton.vue'
 import { ref } from 'vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/services'
@@ -32,7 +33,6 @@ const getHomeHotData = async () => {
 
 // 获取猜你喜欢组件实例
 const guessRef = ref<XtxGuessInstance>()
-
 // 滚动触底事件
 const onScrolltolower = () => {
   guessRef.value?.getMore()
@@ -49,6 +49,16 @@ const onRefresherrefresh = async () => {
   await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()]) // 关闭动画
   isTriggered.value = false
 }
+
+// 是否加载中标记
+const isLoading = ref(false)
+
+// 页面加载
+onLoad(async () => {
+  isLoading.value = true
+  await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
+  isLoading.value = false
+})
 
 // 页面加载
 onLoad(() => {
@@ -68,10 +78,13 @@ onLoad(() => {
     @refresherrefresh="onRefresherrefresh"
     :refresher-triggered="isTriggered"
   >
-    <XtxSwiper :list="bannerList" />
-    <CategoryPanel :list="categoryList" />
-    <HotPanel :list="hotList" />
-    <XtxGuess ref="guessRef" />
+    <PageSkeleton v-if="isLoading"> </PageSkeleton>
+    <template v-else>
+      <XtxSwiper :list="bannerList" />
+      <CategoryPanel :list="categoryList" />
+      <HotPanel :list="hotList" />
+      <XtxGuess ref="guessRef" />
+    </template>
   </scroll-view>
 </template>
 
