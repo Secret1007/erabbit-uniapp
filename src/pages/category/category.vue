@@ -4,8 +4,8 @@ import { getCategoryTopAPI } from '@/services/category'
 import type { CategoryTopItem } from '@/types/category'
 import type { BannerItem } from '@/types/home'
 import { onLoad } from '@dcloudio/uni-app'
-import { computed } from 'vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import PageSkeleton from './components/PageSkeleton.vue'
 
 // 获取轮播图数据
 const bannerList = ref<BannerItem[]>([])
@@ -27,6 +27,12 @@ const subCategoryList = computed(() => {
 const activeIndex = ref(0)
 // 是否数据加载完毕
 const isFinish = ref(false)
+// 轮播图变化时
+const currentIndex = ref(0)
+const onChange: UniHelper.SwiperOnChange = (ev) => {
+  currentIndex.value = ev.detail.current
+}
+
 // 页面加载
 onLoad(async () => {
   await Promise.all([getBannerData(), getCategoryTopData()])
@@ -35,7 +41,7 @@ onLoad(async () => {
 </script>
 
 <template>
-  <view class="viewport">
+  <view class="viewport" v-if="isFinish">
     <!-- 分类 -->
     <view class="categories">
       <!-- 左侧：一级分类 -->
@@ -80,6 +86,7 @@ onLoad(async () => {
       </scroll-view>
     </view>
   </view>
+  <PageSkeleton v-else />
 </template>
 
 <style lang="scss">
